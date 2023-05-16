@@ -8,11 +8,13 @@ namespace Schedule.Models
 {
     class Load
     {
-        public Teacher Teacher { get; set; }
-        public Discipline Discipline { get; set; }
-        public Group Group { get; set; }
-        public SubGroup SubGroup { get; set; }
-        public LessonType LessonType { get; set; }
-        public int Hours { get; set; }
+        public virtual int Id { get; set; }
+        public virtual Teacher Teacher { get; set; }
+        public virtual Discipline Discipline { get; set; }
+        public virtual Group Group { get; set; }
+        public virtual SubGroup SubGroup { get; set; }
+        public virtual LessonType LessonType { get; set; }
+        public virtual int HoursBalance { get; set; }
+        public virtual int DistributeHours { get; set; }
     }
 }

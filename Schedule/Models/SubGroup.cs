@@ -8,6 +8,7 @@ namespace Schedule.Models
 {
     class SubGroup
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public Group Group { get; set; }
     }

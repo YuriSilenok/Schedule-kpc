@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Schedule"
         xmlns:vm="clr-namespace:Schedule.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280">
+        Title="Выдача часов" Height="720" Width="1280">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -17,8 +17,13 @@
                 <TextBlock Text=" - "/>
                 <TextBlock Text="{Binding Month}"/>
             </StackPanel>
-            <DataGrid ItemsSource="{Binding Table}">
-
+            <DataGrid ItemsSource="{Binding IssuingHoursTableViewModal}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn 
+                        IsReadOnly="True" 
+                        Header="Дисциплина"
+                        Binding="{Binding Teacher.Name}"/>
+                </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
     </Grid>
