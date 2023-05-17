@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Schedule.Models
 {
-    class SubGroup
+    public class SubGroup
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public Group Group { get; set; }
+        public virtual int Id { get; set; }
+        public virtual string Name { get; set; }
+        public virtual Group Group { get; set; }
     }
 }

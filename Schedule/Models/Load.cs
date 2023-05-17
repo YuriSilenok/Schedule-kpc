@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Schedule.Models
 {
-    class Load
+    public class Load
     {
         public virtual int Id { get; set; }
         public virtual Teacher Teacher { get; set; }

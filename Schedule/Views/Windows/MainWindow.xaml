@@ -17,13 +17,8 @@
                 <TextBlock Text=" - "/>
                 <TextBlock Text="{Binding Month}"/>
             </StackPanel>
-            <DataGrid ItemsSource="{Binding IssuingHoursTableViewModal}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn 
-                        IsReadOnly="True" 
-                        Header="Дисциплина"
-                        Binding="{Binding Teacher.Name}"/>
-                </DataGrid.Columns>
+            <DataGrid ItemsSource="{Binding IssuingHoursTableViewModal.Data}">
+
             </DataGrid>
         </DockPanel>
     </Grid>

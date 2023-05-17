@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Schedule.Models
 {
-    class IssuingHours
+    public class IssuingHours
     {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public Load Load { get; set; }
-        public int? Hours { get; set; }
+        public virtual int Id { get; set; }
+        public virtual DateTime Date { get; set; }
+        public virtual Load Load { get; set; }
+        public virtual int? Hours { get; set; }
     }
 }
