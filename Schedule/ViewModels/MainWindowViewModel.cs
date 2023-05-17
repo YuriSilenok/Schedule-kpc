@@ -1,9 +1,11 @@
-﻿using Schedule.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Models;
 using Schedule.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,7 +57,7 @@ namespace Schedule.ViewModels
             using(DBContext db = new DBContext())
             {
                 Group = db.Groups.First();
-                Month = 8;
+                Month = 5;
             }
 
             IssuingHoursTableViewModal = new IssuingHoursTableViewModal(Group, Month);
@@ -72,6 +74,7 @@ namespace Schedule.ViewModels
                 List<IssuingHours> IssuingHours = db.IssuingHours
                     .Where(i => i.Date.Month == month && i.Load.Group == group)
                     .ToList();
+                
                 foreach (IssuingHours issuingHours in IssuingHours)
                 {
                     IssuingHoursItemViewModal item = new IssuingHoursItemViewModal()
@@ -82,7 +85,7 @@ namespace Schedule.ViewModels
                         Teacher = issuingHours.Load.Teacher,
                         HoursBalance = 0
                     };
-                    item.HoursInDays[issuingHours.Date.Day] = issuingHours.Hours;
+                    item.HoursInDays[] = issuingHours.Hours;
                     Data.Add(item);
                 }
             }
