@@ -85,7 +85,7 @@ namespace Schedule.ViewModels
                         Teacher = issuingHours.Load.Teacher,
                         HoursBalance = 0
                     };
-                    item.HoursInDays[] = issuingHours.Hours;
+                    item.HoursInDays[0] = issuingHours.Hours;
                     Data.Add(item);
                 }
             }
