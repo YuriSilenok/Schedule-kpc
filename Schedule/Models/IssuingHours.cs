@@ -8,9 +8,11 @@ namespace Schedule.Models
 {
     public class IssuingHours
     {
-        public virtual int Id { get; set; }
-        public virtual DateTime Date { get; set; }
+        public int Id { get; set; }
+        public DateTime Date { get; set; }
+        public int? Hours { get; set; }
+
+        public int LoadId { get; set; }
         public virtual Load Load { get; set; }
-        public virtual int? Hours { get; set; }
     }
 }

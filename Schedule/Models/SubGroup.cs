@@ -8,8 +8,10 @@ namespace Schedule.Models
 {
     public class SubGroup
     {
-        public virtual int Id { get; set; }
-        public virtual string Name { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public int GroupId { get; set; }
         public virtual Group Group { get; set; }
     }
 }
