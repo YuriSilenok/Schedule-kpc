@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Schedule.Common;
 
 namespace Schedule.Models
 {
-    public class SubGroup
+    public class SubGroup : Notify
     {
+        private string name;
+
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get => name; set => Set(ref name, value); }
 
         public int GroupId { get; set; }
         public virtual Group Group { get; set; }

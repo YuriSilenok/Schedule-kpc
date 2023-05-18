@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Schedule.Models;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
 using System.Windows.Threading;
-using System.Xaml;
 
-namespace Schedule.ViewModels.Base
+namespace Schedule.Common
 {
-    internal abstract class ViewModel : INotifyPropertyChanged
+    public abstract class Notify : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,6 +32,6 @@ namespace Schedule.ViewModels.Base
             return true;
         }
 
-       
+
     }
 }

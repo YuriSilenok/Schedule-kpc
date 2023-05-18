@@ -5,20 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Schedule"
         xmlns:vm="clr-namespace:Schedule.ViewModels"
+        xmlns:cmd="clr-namespace:Schedule.Infrastructure.Commands"
         mc:Ignorable="d"
+        
         Title="Выдача часов" Height="720" Width="1280">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <cmd:CloseWindowCommand x:Key="CloseWindowCommand"/>
+    </Window.Resources>
     <Grid>
         <DockPanel>
-            <StackPanel Orientation="Horizontal"  DockPanel.Dock="Top">
-                <TextBlock Text="{Binding Group.Name}"/>
-                <TextBlock Text=" - "/>
-                <TextBlock Text="{Binding Month}"/>
+            <StackPanel Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                <TextBlock Text="Группа:"
+                           Margin="3"/>
+                <ComboBox ItemsSource="{Binding Groups}"
+                          SelectedItem="{Binding SelectedGroup}"
+                          Width="100"/>
+                <TextBlock Text="Месяц:" Margin="3"/>
+                <ComboBox Width="100"
+                          ItemsSource="{Binding Months}"
+                          SelectedIndex="{Binding SelectedMonth}"/>
             </StackPanel>
-            <DataGrid ItemsSource="{Binding IssuingHoursTableViewModal.Data}">
-
+            <DataGrid ItemsSource="{Binding Table}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дисциплина"
+                                        Binding="{Binding Discipline.Name}"/>
+                    <DataGridTextColumn Header="Вид занятия"
+                                        Binding="{Binding LessonType.Name}"/>
+                </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
     </Grid>

@@ -1,137 +1,129 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Schedule.Common;
 using Schedule.Models;
-using Schedule.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Schedule.ViewModels
 {
-    class MainWindowViewModelItem : ViewModel
+    internal class MainWindowViewModel : Notify
     {
-        private string discipline;
-        public string Discipline
-        {
-            get => discipline;
-            set=>Set(ref discipline, value);
-        }
+        private ObservableCollection<Row> table;
+        private Group selectedGroup;
+        private int selectedMonth = DateTime.Now.Month - 1;
 
-
-
-
-    }
-
-    class MainWindowViewModel : ViewModel
-    {
-        public IssuingHoursTableViewModal IssuingHoursTableViewModal { get; set; }
-
-        private Group group;
-        public Group Group { 
-            get => group;
-            set => Set(ref group, value);
-        }
-
-        private int month;
-        public int Month
-        {
-            get => month;
-            set => Set(ref month, value);
-        }
-
-
-        private DataTable table;
-        public DataTable Table
-        {
-            get => table;
-            set => Set(ref table, value);
-        }
-
+        public ObservableCollection<Row> Table { get => table; set => Set(ref table, value); }
+        public ObservableCollection<Group> Groups { get; } = new ObservableCollection<Group>(DBContext.DB.Groups);
         
-        public MainWindowViewModel()
+        public Group SelectedGroup
         {
-            using(DBContext db = new DBContext())
-            {
-                Group = db.Groups.First();
-                Month = 5;
+            get => selectedGroup;
+            set 
+            { 
+                Set(ref selectedGroup, value);
+                UpdateTable();
             }
-
-            IssuingHoursTableViewModal = new IssuingHoursTableViewModal(Group, Month);
-
         }
-    }
-    internal class IssuingHoursTableViewModal : ViewModel
-    {
-        public List<IssuingHoursItemViewModal> Data = new List<IssuingHoursItemViewModal>();
-        public IssuingHoursTableViewModal(Group group, int month)
+
+        public List<string> Months { get; } = new List<string>()
         {
-            using (DBContext db = new DBContext())
+            "Январь", "Февраль", "Март", "Апрель",
+            "Май", "Июнь", "Июль", "Август",
+            "Сентябрь", "Октябрь", "Декабрь"
+        };
+        
+        public int SelectedMonth
+        {
+            get => selectedMonth;
+            set
             {
-                List<IssuingHours> IssuingHours = db.IssuingHours
-                    .Where(i => i.Date.Month == month && i.Load.Group == group)
-                    .ToList();
-                
-                foreach (IssuingHours issuingHours in IssuingHours)
+                Set(ref selectedMonth, value);
+                UpdateTable();
+            }
+        }
+
+        private void UpdateTable()
+        {
+            if (selectedGroup == null) return;
+
+            ObservableCollection<Row> table = new ObservableCollection<Row>();
+
+            DBContext db = DBContext.DB;
+            List<IssuingHours> IssuingHours = db.IssuingHours
+                .Where(i => i.Date.Month == selectedMonth + 1 && i.Load.GroupId == selectedGroup.Id)
+                .ToList();
+            Row row = null;
+            foreach (IssuingHours issuingHours in IssuingHours)
+            {
+                if (row == null) row = new Row();
+                else if (row.Discipline.Id != issuingHours.Load.DisciplineId ||
+                    row.LessonType.Id != issuingHours.Load.LessonTypeId)
                 {
-                    IssuingHoursItemViewModal item = new IssuingHoursItemViewModal()
-                    {
-                        Discipline = issuingHours.Load.Discipline,
-                        LessonType = issuingHours.Load.LessonType,
-                        DistributeHours = issuingHours.Load.HoursBalance,
-                        Teacher = issuingHours.Load.Teacher,
-                        HoursBalance = 0
-                    };
-                    item.HoursInDays[0] = issuingHours.Hours;
-                    Data.Add(item);
+                    table.Add(row);
+                    row = new Row();
                 }
+
+                row.Discipline = issuingHours.Load.Discipline;
+                row.LessonType = issuingHours.Load.LessonType;
+                row.DistributeHours = issuingHours.Load.HoursBalance;
+                row.Teacher = issuingHours.Load.Teacher;
+                row.HoursBalance = 0;
+                row.HoursInDays[issuingHours.Date.Day] = issuingHours;
+
             }
+            if (row != null) table.Add(row);
+
+            Table = table;
         }
-    }
 
-    internal class IssuingHoursItemViewModal : ViewModel
-    {
-        public Discipline Discipline { get; set; }
-        public Teacher Teacher { get; set; }
-        public LessonType LessonType { get; set; }
-        public int DistributeHours { get; set; }
-        public int Total { get; set; }
-        public int HoursBalance { get; set; }
+        public class Row : Notify
+        {
+            public int Year { get; set; }
+            public int Month { get; set; }
+            public Load Load { get; set; }
+            public Discipline Discipline { get; set; }
+            public Teacher Teacher { get; set; }
+            public LessonType LessonType { get; set; }
+            public int DistributeHours { get; set; }
+            public int Total { get; set; }
+            public int HoursBalance { get; set; }
 
-        public int?[] HoursInDays { get; set; } = new int?[31];
-        public int? HoursInDay01 { get => HoursInDays[0]; set => HoursInDays[0] = value; }
-        public int? HoursInDay02 { get => HoursInDays[1]; set => HoursInDays[1] = value; }
-        public int? HoursInDay03 { get => HoursInDays[2]; set => HoursInDays[2] = value; }
-        public int? HoursInDay04 { get => HoursInDays[3]; set => HoursInDays[3] = value; }
-        public int? HoursInDay05 { get => HoursInDays[4]; set => HoursInDays[4] = value; }
-        public int? HoursInDay06 { get => HoursInDays[5]; set => HoursInDays[5] = value; }
-        public int? HoursInDay07 { get => HoursInDays[6]; set => HoursInDays[6] = value; }
-        public int? HoursInDay08 { get => HoursInDays[7]; set => HoursInDays[7] = value; }
-        public int? HoursInDay09 { get => HoursInDays[8]; set => HoursInDays[8] = value; }
-        public int? HoursInDay10 { get => HoursInDays[9]; set => HoursInDays[9] = value; }
-        public int? HoursInDay11 { get => HoursInDays[10]; set => HoursInDays[10] = value; }
-        public int? HoursInDay12 { get => HoursInDays[11]; set => HoursInDays[11] = value; }
-        public int? HoursInDay13 { get => HoursInDays[12]; set => HoursInDays[12] = value; }
-        public int? HoursInDay14 { get => HoursInDays[13]; set => HoursInDays[13] = value; }
-        public int? HoursInDay15 { get => HoursInDays[14]; set => HoursInDays[14] = value; }
-        public int? HoursInDay16 { get => HoursInDays[15]; set => HoursInDays[15] = value; }
-        public int? HoursInDay17 { get => HoursInDays[16]; set => HoursInDays[16] = value; }
-        public int? HoursInDay18 { get => HoursInDays[17]; set => HoursInDays[17] = value; }
-        public int? HoursInDay19 { get => HoursInDays[18]; set => HoursInDays[18] = value; }
-        public int? HoursInDay20 { get => HoursInDays[19]; set => HoursInDays[19] = value; }
-        public int? HoursInDay21 { get => HoursInDays[20]; set => HoursInDays[20] = value; }
-        public int? HoursInDay22 { get => HoursInDays[21]; set => HoursInDays[21] = value; }
-        public int? HoursInDay23 { get => HoursInDays[22]; set => HoursInDays[22] = value; }
-        public int? HoursInDay24 { get => HoursInDays[23]; set => HoursInDays[23] = value; }
-        public int? HoursInDay25 { get => HoursInDays[24]; set => HoursInDays[24] = value; }
-        public int? HoursInDay26 { get => HoursInDays[25]; set => HoursInDays[25] = value; }
-        public int? HoursInDay27 { get => HoursInDays[26]; set => HoursInDays[26] = value; }
-        public int? HoursInDay28 { get => HoursInDays[27]; set => HoursInDays[27] = value; }
-        public int? HoursInDay29 { get => HoursInDays[28]; set => HoursInDays[28] = value; }
-        public int? HoursInDay30 { get => HoursInDays[29]; set => HoursInDays[29] = value; }
-        public int? HoursInDay31 { get => HoursInDays[30]; set => HoursInDays[30] = value; }
+            public IssuingHours[] HoursInDays { get; set; } = new IssuingHours[31];
+
+            public IssuingHours HoursInDay01 { get => HoursInDays[0]; set => Set(ref HoursInDays[0], value); }
+            public IssuingHours HoursInDay02 { get => HoursInDays[1]; set => Set(ref HoursInDays[1], value); }
+            public IssuingHours HoursInDay03 { get => HoursInDays[2]; set => Set(ref HoursInDays[2], value); }
+            public IssuingHours HoursInDay04 { get => HoursInDays[3]; set => Set(ref HoursInDays[3], value); }
+            public IssuingHours HoursInDay05 { get => HoursInDays[4]; set => Set(ref HoursInDays[4], value); }
+            public IssuingHours HoursInDay06 { get => HoursInDays[5]; set => Set(ref HoursInDays[5], value); }
+            public IssuingHours HoursInDay07 { get => HoursInDays[6]; set => Set(ref HoursInDays[6], value); }
+            public IssuingHours HoursInDay08 { get => HoursInDays[7]; set => Set(ref HoursInDays[7], value); }
+            public IssuingHours HoursInDay09 { get => HoursInDays[8]; set => Set(ref HoursInDays[8], value); }
+            public IssuingHours HoursInDay10 { get => HoursInDays[9]; set => Set(ref HoursInDays[9], value); }
+            public IssuingHours HoursInDay11 { get => HoursInDays[10]; set => Set(ref HoursInDays[10], value); }
+            public IssuingHours HoursInDay12 { get => HoursInDays[11]; set => Set(ref HoursInDays[11], value); }
+            public IssuingHours HoursInDay13 { get => HoursInDays[12]; set => Set(ref HoursInDays[12], value); }
+            public IssuingHours HoursInDay14 { get => HoursInDays[13]; set => Set(ref HoursInDays[13], value); }
+            public IssuingHours HoursInDay15 { get => HoursInDays[14]; set => Set(ref HoursInDays[14], value); }
+            public IssuingHours HoursInDay16 { get => HoursInDays[15]; set => Set(ref HoursInDays[15], value); }
+            public IssuingHours HoursInDay17 { get => HoursInDays[16]; set => Set(ref HoursInDays[16], value); }
+            public IssuingHours HoursInDay18 { get => HoursInDays[17]; set => Set(ref HoursInDays[17], value); }
+            public IssuingHours HoursInDay19 { get => HoursInDays[18]; set => Set(ref HoursInDays[18], value); }
+            public IssuingHours HoursInDay20 { get => HoursInDays[19]; set => Set(ref HoursInDays[19], value); }
+            public IssuingHours HoursInDay21 { get => HoursInDays[20]; set => Set(ref HoursInDays[20], value); }
+            public IssuingHours HoursInDay22 { get => HoursInDays[21]; set => Set(ref HoursInDays[21], value); }
+            public IssuingHours HoursInDay23 { get => HoursInDays[22]; set => Set(ref HoursInDays[22], value); }
+            public IssuingHours HoursInDay24 { get => HoursInDays[23]; set => Set(ref HoursInDays[23], value); }
+            public IssuingHours HoursInDay25 { get => HoursInDays[24]; set => Set(ref HoursInDays[24], value); }
+            public IssuingHours HoursInDay26 { get => HoursInDays[25]; set => Set(ref HoursInDays[25], value); }
+            public IssuingHours HoursInDay27 { get => HoursInDays[26]; set => Set(ref HoursInDays[26], value); }
+            public IssuingHours HoursInDay28 { get => HoursInDays[27]; set => Set(ref HoursInDays[27], value); }
+            public IssuingHours HoursInDay29 { get => HoursInDays[28]; set => Set(ref HoursInDays[28], value); }
+            public IssuingHours HoursInDay30 { get => HoursInDays[29]; set => Set(ref HoursInDays[29], value); }
+            public IssuingHours HoursInDay31 { get => HoursInDays[30]; set => Set(ref HoursInDays[30], value); }
+        }
     }
 }

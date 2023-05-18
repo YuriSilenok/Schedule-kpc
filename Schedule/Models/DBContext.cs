@@ -15,6 +15,10 @@ namespace Schedule.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=db.db");
+            optionsBuilder.UseLazyLoadingProxies();
         }
+
+        private static DBContext db;
+        public static DBContext DB { get => db ??= new DBContext(); }
     }
 }
